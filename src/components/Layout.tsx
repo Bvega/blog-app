@@ -1,14 +1,22 @@
 import React from 'react';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const Layout: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const pageVariants = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
   };
 
   return (
@@ -32,7 +40,18 @@ const Layout: React.FC = () => {
         </nav>
       </header>
       <main className="main-content">
-        <Outlet />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={pageVariants}
+            transition={{ duration: 0.3 }}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
       <footer className="footer">
         <p>&copy; 2024 My Blog. All rights reserved.</p>
